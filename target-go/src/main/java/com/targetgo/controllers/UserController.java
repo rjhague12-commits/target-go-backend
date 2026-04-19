@@ -1,9 +1,5 @@
 package com.targetgo.controllers;
 
-import com.targetgo.models.User;
-package com.targetgo.controllers;
-
-import com.targetgo.models.User;
 import com.targetgo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
