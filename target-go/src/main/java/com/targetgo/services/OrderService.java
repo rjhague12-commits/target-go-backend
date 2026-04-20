@@ -38,7 +38,7 @@ public class OrderService {
         // Attempt payment
         PaymentService.PaymentResult result = paymentService.processPayment(cardNumber, total);
 
-        // Create the order record regardless (so we track failed attempts too)
+        // Create the order record
         Order order = new Order();
         order.setUser(user);
         order.setTotalAmount(total);
@@ -47,7 +47,6 @@ public class OrderService {
         order = orderRepository.save(order);
 
         if (result.success) {
-            // Snapshot cart items into order items
             List<OrderItem> orderItems = new ArrayList<>();
             for (CartItem ci : cartItems) {
                 OrderItem oi = new OrderItem();
@@ -57,21 +56,21 @@ public class OrderService {
                 oi.setPriceAtPurchase(ci.getProduct().getPrice());
                 orderItems.add(oi);
 
-                // Deduct stock
-                Product product = ci.getProduct();
+                // Deduct stock using direct repository query
+                Product product = productRepository.findById(ci.getProduct().getId())
+                        .orElseThrow(() -> new RuntimeException("Product not found"));
                 product.setStockQuantity(product.getStockQuantity() - ci.getQuantity());
                 productRepository.save(product);
             }
             orderItemRepository.saveAll(orderItems);
             order.setItems(orderItems);
-
-            // Clear cart after successful purchase
             cartItemRepository.deleteByUser(user);
         } else {
             throw new RuntimeException("Payment failed: " + result.message);
         }
 
         return order;
+    }
     }
 
     // ── Get all orders for a user ─────────────────────────────────────
