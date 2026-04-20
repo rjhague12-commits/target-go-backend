@@ -19,7 +19,6 @@ public class OrderService {
     @Autowired private ProductRepository productRepository;
     @Autowired private PaymentService paymentService;
 
-    // ── Checkout: convert cart → order, run payment ───────────────────
     @Transactional
     public Order checkout(String email, String cardNumber) {
         User user = getUserByEmail(email);
@@ -71,15 +70,14 @@ public class OrderService {
 
         return order;
     }
-    }
 
-    // ── Get all orders for a user ─────────────────────────────────────
+    // Get all orders for a user
     public List<Order> getOrderHistory(String email) {
         User user = getUserByEmail(email);
         return orderRepository.findByUserOrderByCreatedAtDesc(user);
     }
 
-    // ── Get a specific order (receipt) ────────────────────────────────
+    // Get a specific order
     public Order getOrder(String email, Long orderId) {
         User user = getUserByEmail(email);
         Order order = orderRepository.findById(orderId)
